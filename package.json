@@ -9,7 +9,11 @@
   "scripts": {
     "test": "mocha"
   },
-  "author": "",
+  "author": "Alex J Burke <alex@alexjeffburke.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alexjeffburke/hesse.git"
+  },
   "license": "BSD-3-Clause",
   "dependencies": {
     "ecstatic": "2.0.0",
