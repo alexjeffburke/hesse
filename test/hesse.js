@@ -17,11 +17,28 @@ describe('hesse', function () {
         });
     });
 
-    it('should successfully run', function () {
+    it('should error without a directory', function () {
         var port = 50000;
 
         return expect.promise(function () {
             var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '--', 'node', 'testdata/example.js']);
+            var stderrString;
+
+            return expect.promise(function (resolve, reject) {
+                testProcess.stderr.once('data', function (d) {
+                    stderrString = d.toString();
+
+                    expect(stderrString, 'to equal', 'No directory argument specified.\n').then(resolve).caught(reject);
+                });
+            });
+        });
+    });
+
+    it('should successfully run', function () {
+        var port = 50000;
+
+        return expect.promise(function () {
+            var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '.', '--', 'node', 'testdata/example.js']);
             var stderrString;
 
             var httpPromise = expect.promise(function (resolve, reject) {
@@ -50,7 +67,7 @@ describe('hesse', function () {
         var port = 50000;
 
         return expect.promise(function () {
-            var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '--', 'node', __dirname + '/../testdata/example.js']);
+            var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '.', '--', 'node', __dirname + '/../testdata/example.js']);
             var outputBuffers = [];
             var stderrString;
 
@@ -86,7 +103,7 @@ describe('hesse', function () {
         var port = 50000;
 
         return expect.promise(function () {
-            var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '--', 'node', __dirname + '/../testdata/exit2.js']);
+            var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '.', '--', 'node', __dirname + '/../testdata/exit2.js']);
 
             return expect.promise(function (run) {
                 testProcess.on('exit', run(function (code) {

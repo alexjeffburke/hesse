@@ -2,6 +2,7 @@
 
 var childProcess = require('child_process');
 var http = require('http');
+var path = require('path');
 
 var ecstatic = require('ecstatic');
 var minimist = require('minimist');
@@ -32,9 +33,16 @@ function processArgv(argv) {
 
 function serveAndExec(args, callback) {
     var cwd = process.cwd();
+    var dirArg = args.serve._[0];
+
+    if (!dirArg) {
+        return callback(new Error('No directory argument specified.'));
+    }
+
+    var root = path.join(cwd, dirArg);
 
     var serve = http.createServer(function (req, res) {
-        ecstatic({ root: cwd })(req, res);
+        ecstatic({ root: root })(req, res);
     });
     serve.listen(args.serve.port, function () {
         process.stderr.write('serving');
