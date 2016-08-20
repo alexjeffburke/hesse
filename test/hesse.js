@@ -22,9 +22,15 @@ describe('hesse', function () {
 
         return expect.promise(function () {
             var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '--', 'node', 'testdata/example.js']);
+            var stderrString;
 
             var httpPromise = expect.promise(function (resolve, reject) {
                 testProcess.stderr.once('data', function (d) {
+                    stderrString = d.toString();
+
+                    if (stderrString !== 'serving') {
+                        return reject(new Error(stderrString))
+                    }
 
                     expect('http://127.0.0.1:' + port, 'to have a running server').then(resolve).caught(reject);
                 });
@@ -46,6 +52,11 @@ describe('hesse', function () {
         return expect.promise(function () {
             var testProcess = childProcess.execFile('node', [basePath + 'bin/hesse.js', '--port', port, '--', 'node', __dirname + '/../testdata/example.js']);
             var outputBuffers = [];
+            var stderrString;
+
+            testProcess.stderr.once('data', function (d) {
+                stderrString = d.toString();
+            });
 
             testProcess.stdout.on('data', function (d) {
                 outputBuffers.push(d);
@@ -54,6 +65,9 @@ describe('hesse', function () {
             return expect.promise(function (resolve, reject) {
                 testProcess.on('exit', function (code) {
                     setImmediate(function () {
+                        if (stderrString !== 'serving') {
+                            return reject(new Error(stderrString));
+                        }
 
                         var stdoutLines = outputBuffers.map(function (b) {
                             return b.toString();
