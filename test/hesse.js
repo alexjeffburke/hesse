@@ -51,8 +51,8 @@ describe('hesse', function () {
                 outputBuffers.push(d);
             });
 
-            return expect.promise(function (run) {
-                testProcess.on('exit', run(function (code) {
+            return expect.promise(function (resolve, reject) {
+                testProcess.on('exit', function (code) {
                     setImmediate(function () {
 
                         var stdoutLines = outputBuffers.map(function (b) {
@@ -60,10 +60,10 @@ describe('hesse', function () {
                         });
 
                         expect(stdoutLines, 'to equal', [
-                            'RAN!!!'
-                        ]);
+                            'RAN!!\n'
+                        ]).then(resolve).caught(reject);
                     });
-                }));
+                });
             });
         });
     });
